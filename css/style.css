@@ -125,9 +125,6 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 .gallery figure { margin: 0 0 32px; break-inside: avoid; background: var(--light); }
 .gallery a { display: block; }
 .gallery img { width: 100%; height: auto; }
-/* Vertical photos (marked "tall" by build.js) are smaller and centered.
-   Change 78% to adjust: smaller number = smaller photo. */
-.gallery figure.tall { width: 78%; margin-left: auto; margin-right: auto; margin-bottom: 32px; }
 /* Name a file like DSCF1234-wide.jpg to make it span both columns */
 .gallery figure.wide { column-span: all; }
 
@@ -183,7 +180,6 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
   .grid { grid-template-columns: 1fr; row-gap: 40px; }
   .gallery { column-gap: 12px; }
   .gallery figure { margin-bottom: 12px; }
-  .gallery figure.tall { width: 86%; margin-bottom: 12px; }
   .pager a { max-width: 48%; gap: .6rem; }
   .pager a::before, .pager a::after { width: 26px; height: 26px; }
 }
