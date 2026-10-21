@@ -1,13 +1,3 @@
-// Run with:  node build.js
-//
-// Reads the photos you put in images/<project>/ and writes them into the
-// home page and each project page. Run it again any time you add, remove,
-// or rename photos.
-//
-// Per project folder:
-//   cover.jpg      the photo shown on the home page grid
-//   01.jpg, 02.jpg ...   gallery photos, shown in filename order
-//   Add "-wide" to a filename (e.g. 04-wide.jpg) to make it span both columns.
 
 const fs = require("fs");
 const path = require("path");

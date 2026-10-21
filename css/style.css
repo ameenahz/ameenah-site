@@ -1,3 +1,5 @@
+
+Style · CSS
 /* Design tokens */
 :root {
   --bg: #fff;
@@ -7,7 +9,7 @@
   --max: 1400px;
   --font: "Figtree", "Proxima Nova", "Helvetica Neue", Arial, sans-serif;
 }
-
+ 
 *, *::before, *::after { box-sizing: border-box; }
 body {
   margin: 0;
@@ -22,7 +24,7 @@ img { display: block; max-width: 100%; }
 a { color: inherit; }
 a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 ul { list-style: none; margin: 0; padding: 0; }
-
+ 
 /* Header */
 .site-header {
   display: flex;
@@ -38,7 +40,7 @@ ul { list-style: none; margin: 0; padding: 0; }
 .site-header nav a { text-decoration: none; display: inline-flex; padding-bottom: 2px; border-bottom: 1px solid transparent; }
 .site-header nav a:hover,
 .site-header nav a[aria-current="page"] { border-bottom-color: currentColor; }
-
+ 
 /* Home grid */
 main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 .grid {
@@ -59,17 +61,27 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
   padding: 1.5rem; text-align: center;
   font-size: clamp(1.1rem, 2vw, 1.6rem); font-weight: 500; line-height: 1.25;
 }
-
+ 
 /* About, Contact */
 .text-page { max-width: 640px; padding: 3rem 0 6rem; }
 .text-page h1, .project h1 { font-weight: 500; font-size: clamp(1.8rem, 3vw, 2.4rem); line-height: 1.15; margin: 0 0 1.5rem; }
 .text-page p { margin: 0 0 1.25rem; }
-
+ 
 /* Project pages */
-.project { max-width: 1000px; margin: 0 auto; padding: 2rem 0 5rem; }
-.project img { width: 100%; height: auto; margin-bottom: 24px; background: #eee; }
-.back { display: inline-block; margin-top: 1.5rem; }
-
+/* Change --gallery-width to make the photos bigger or smaller */
+.project { --gallery-width: 880px; max-width: var(--gallery-width); margin: 0 auto; padding: 1rem 0 4rem; }
+.project-intro { margin: -.75rem 0 2.5rem; }
+.gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
+.gallery figure { margin: 0; aspect-ratio: 3 / 4; overflow: hidden; background: #eee; }
+.gallery a { display: block; height: 100%; }
+.gallery img { width: 100%; height: 100%; object-fit: cover; }
+.pager { display: flex; justify-content: space-between; gap: 2rem; margin-top: 5rem; }
+.pager a { display: flex; flex-direction: column; gap: .25rem; text-decoration: none; max-width: 45%; }
+.pager a span { font-size: .85rem; color: var(--muted); }
+.pager a strong { font-weight: 500; font-size: clamp(1.1rem, 2vw, 1.5rem); line-height: 1.25; }
+.pager a:hover strong { text-decoration: underline; }
+.pager .next { margin-left: auto; text-align: right; }
+ 
 /* Footer */
 .site-footer {
   display: flex; flex-direction: column; align-items: center; gap: .75rem;
@@ -78,7 +90,7 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 }
 .site-footer a { text-decoration: none; }
 .site-footer a:hover { text-decoration: underline; }
-
+ 
 /* Mobile */
 @media (max-width: 767px) {
   .site-header { padding: 6vw var(--gutter); }
@@ -89,3 +101,9 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
   .tile img, .tile::after { transition: none; }
   .tile:hover img { transform: none; }
 }
+ 
+@media (max-width: 767px) {
+  .gallery { gap: 12px; }
+  .pager a { max-width: 48%; }
+}
+ 
