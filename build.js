@@ -18,7 +18,7 @@ const IMAGE = /\.(jpe?g|png|webp|avif)$/i;
 const byName = (a, b) => a.localeCompare(b, undefined, { numeric: true });
 const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;");
 
-// Replace everything between <!-- TAG:START ... --> and <!-- TAG:END -->
+
 function fill(html, tag, content) {
   const re = new RegExp(`(<!-- ${tag}:START[^>]*-->)[\\s\\S]*?(<!-- ${tag}:END -->)`);
   if (!re.test(html)) throw new Error(`Missing <!-- ${tag}:START --> marker`);
