@@ -1,18 +1,17 @@
-/* Heading font from your Squarespace site (free on Google Fonts) */
+
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap");
 
-/* ---------- Design tokens (from your Squarespace styles) ---------- */
+
 :root {
   --bg: #fff;
   --text: #000;
   --muted: #555;
-  --light: hsl(40 8% 93%);   /* Squarespace "light accent" */
+  --light: hsl(40 8% 93%);   
   --accent: hsl(24 37% 81%);
-  --gutter: 6vw;             /* pagePadding */
-  --max: 1400px;             /* maxPageWidth */
+  --gutter: 6vw;             
+  --max: 1400px;             
   --base-size: 15px;
 
-  /* Archivo Black for headings. Proxima Nova isn't free, so Figtree stands in for body text. */
   --font-heading: "Archivo Black", "Arial Black", Impact, sans-serif;
   --font-body: "Figtree", "Proxima Nova", "Helvetica Neue", Arial, sans-serif;
 
@@ -77,7 +76,7 @@ p { margin: 0 0 1.25rem; }
 .site-header nav a:hover,
 .site-header nav a[aria-current="page"] { border-bottom-color: currentColor; }
 
-/* ---------- Home grid ---------- */
+/* ---------- Home ---------- */
 main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 .grid {
   display: grid;
@@ -112,7 +111,7 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 
 /* ---------- Project pages ---------- */
 /* Change --gallery-width to make the photos bigger or smaller */
-.project { --gallery-width: 880px; max-width: var(--gallery-width); margin: 0 auto; padding: 1rem 0 4rem; }
+.project { --gallery-width: 1200px; max-width: var(--gallery-width); margin: 0 auto; padding: 1rem 0 4rem; }
 .project-intro { margin: -.75rem 0 2.5rem; }
 .gallery { display: grid; grid-template-columns: repeat(2, 1fr); gap: 32px; }
 .gallery figure { margin: 0; aspect-ratio: 3 / 4; overflow: hidden; background: var(--light); }
