@@ -23,30 +23,102 @@
     </nav>
   </header>
   <main>
-    <section class="grid">
-      <!-- TILES:START  -->
-      <a class="tile" href="work/dinner-party/index.html">
-        <img src="images/dinner-party/cover.jpg" alt="Fable x Sally Al-Hadidi Dinner Party" loading="lazy">
-        <span class="tile-title">Fable x Sally Al-Hadidi Dinner Party</span>
-      </a>
-      <a class="tile" href="work/street-and-documentary/index.html">
-        <img src="images/street-and-documentary/cover.jpg" alt="Street and Documentary" loading="lazy">
-        <span class="tile-title">Street and Documentary</span>
-      </a>
-      <a class="tile" href="work/graduation-and-prom/index.html">
-        <img src="images/graduation-and-prom/cover.jpg" alt="Graduation and Prom Photography" loading="lazy">
-        <span class="tile-title">Graduation and Prom Photography</span>
-      </a>
-      <a class="tile" href="work/roots-of-diaspora/index.html">
-        <img src="images/roots-of-diaspora/cover.jpg" alt="Roots of Diaspora Photo Exhibition" loading="lazy">
-        <span class="tile-title">Roots of Diaspora Photo Exhibition</span>
-      </a>
+    <ol class="index-list">
+      <!-- TILES:START (written by build.js, do not edit) -->
+        <li>
+          <a class="index-item" href="work/dinner-party/index.html" data-img="images/dinner-party/cover.jpg">
+            <span class="index-num">01</span>
+            <span class="index-name">Fable x Sally Al-Hadidi Dinner Party</span>
+            <span class="index-count">10 photos</span>
+            <img class="index-thumb" src="images/dinner-party/cover.jpg" alt="" loading="lazy">
+          </a>
+        </li>
+        <li>
+          <a class="index-item" href="work/street-and-documentary/index.html" data-img="images/street-and-documentary/cover.jpg">
+            <span class="index-num">02</span>
+            <span class="index-name">Street and Documentary</span>
+            <span class="index-count">24 photos</span>
+            <img class="index-thumb" src="images/street-and-documentary/cover.jpg" alt="" loading="lazy">
+          </a>
+        </li>
+        <li>
+          <a class="index-item" href="work/graduation-and-prom/index.html" data-img="images/graduation-and-prom/cover.jpg">
+            <span class="index-num">03</span>
+            <span class="index-name">Graduation and Prom Photography</span>
+            <span class="index-count">16 photos</span>
+            <img class="index-thumb" src="images/graduation-and-prom/cover.jpg" alt="" loading="lazy">
+          </a>
+        </li>
+        <li>
+          <a class="index-item" href="work/roots-of-diaspora/index.html" data-img="images/roots-of-diaspora/cover.jpg">
+            <span class="index-num">04</span>
+            <span class="index-name">Roots of Diaspora Photo Exhibition</span>
+            <span class="index-count">15 photos</span>
+            <img class="index-thumb" src="images/roots-of-diaspora/cover.jpg" alt="" loading="lazy">
+          </a>
+        </li>
         <!-- TILES:END -->
-    </section>
+    </ol>
+    <div class="index-preview" aria-hidden="true"><img src="" alt=""></div>
   </main>
   <footer class="site-footer">
     <a href="mailto:Ameenahphotography@gmail.com">Ameenahphotography@gmail.com</a>
     <a href="https://www.instagram.com/ameenahramsey" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r=".8" fill="currentColor"/></svg></a>
   </footer>
+
+  <script>
+    // Floating photo that follows the cursor over the project list (mouse devices only)
+    (function () {
+      var list = document.querySelector(".index-list");
+      var preview = document.querySelector(".index-preview");
+      if (!list || !preview) return;
+      if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+
+      var img = preview.querySelector("img");
+      var reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      var x = 0, y = 0, cx = 0, cy = 0, raf = null;
+
+      function tick() {
+        var ease = reduce ? 1 : 0.14;
+        cx += (x - cx) * ease;
+        cy += (y - cy) * ease;
+        preview.style.transform = "translate3d(" + cx + "px," + cy + "px,0)";
+        raf = Math.abs(x - cx) > 0.3 || Math.abs(y - cy) > 0.3 ? requestAnimationFrame(tick) : null;
+      }
+
+      function moveTo(px, py) {
+        var w = preview.offsetWidth, h = preview.offsetHeight;
+        var tx = px + 40;
+        if (tx + w > window.innerWidth - 10) tx = px - 40 - w;
+        var ty = Math.max(10, Math.min(window.innerHeight - h - 10, py - h / 2));
+        x = tx; y = ty;
+        if (!preview.classList.contains("show")) { cx = x; cy = y; }
+        if (!raf) raf = requestAnimationFrame(tick);
+      }
+
+      function show(item, px, py) {
+        if (img.getAttribute("src") !== item.dataset.img) img.src = item.dataset.img;
+        moveTo(px, py);
+        preview.classList.add("show");
+      }
+      function hide() { preview.classList.remove("show"); }
+
+      list.addEventListener("mousemove", function (e) {
+        var item = e.target.closest(".index-item");
+        if (!item) return hide();
+        show(item, e.clientX, e.clientY);
+      });
+      list.addEventListener("mouseleave", hide);
+
+      // keyboard users: show the photo beside the focused row
+      list.addEventListener("focusin", function (e) {
+        var item = e.target.closest(".index-item");
+        if (!item) return;
+        var r = item.getBoundingClientRect();
+        show(item, r.left + r.width * 0.6, r.top + r.height / 2);
+      });
+      list.addEventListener("focusout", hide);
+    })();
+  </script>
 </body>
 </html>
