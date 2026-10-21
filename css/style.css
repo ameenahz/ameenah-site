@@ -81,49 +81,25 @@ p { margin: 0 0 1.25rem; }
 .site-header nav a[aria-current="page"] { border-bottom-color: currentColor; }
 .site-header nav svg { width: 28px; height: 28px; }
 
-/* ---------- Home: work index ---------- */
+/* ---------- Home: cover photo tiles ---------- */
 main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
-
-.index-list { padding: 2rem 0 5rem; border-top: 2px solid var(--text); }
-.index-item {
+.grid {
   display: grid;
-  grid-template-columns: 4.5rem 1fr auto;
-  align-items: baseline;
-  column-gap: 1.5rem;
-  padding: 1.7rem 0;
-  border-bottom: 2px solid var(--text);
-  text-decoration: none;
-  transition: opacity .3s ease, padding .35s ease;
+  grid-template-columns: repeat(2, 1fr);
+  column-gap: 80px;
+  row-gap: 75px;
+  padding: 2rem 0 5rem;
 }
-.index-num { font-size: var(--text-small); font-weight: 700; font-variant-numeric: tabular-nums; }
-.index-name {
-  font-family: var(--font-heading);
-  font-size: clamp(1.9rem, 4.6vw, 4.2rem);
-  line-height: 1.08;
-}
-.index-count { font-size: var(--text-small); color: var(--muted); white-space: nowrap; }
-.index-thumb { display: none; }
-
-/* floating photo that follows the cursor (set up by the script in index.html) */
-.index-preview {
-  position: fixed; top: 0; left: 0; z-index: 20;
-  width: min(22vw, 340px); aspect-ratio: 3 / 4;
-  pointer-events: none; overflow: hidden; background: var(--light);
-  opacity: 0; transition: opacity .25s ease;
-  will-change: transform;
-}
-.index-preview.show { opacity: 1; }
-.index-preview img { width: 100%; height: 100%; object-fit: cover; }
-
-@media (hover: hover) and (pointer: fine) {
-  /* fade the other projects while one is hovered */
-  .index-list:hover .index-item:not(:hover):not(:focus-visible) { opacity: .22; }
-  .index-item:hover, .index-item:focus-visible { padding-left: 1.25rem; }
-}
-/* touch screens have no hover, so each row shows its photo instead */
-@media not all and (hover: hover) and (pointer: fine) {
-  .index-thumb { display: block; grid-column: 1 / -1; width: 100%; aspect-ratio: 16 / 10; object-fit: cover; margin-top: 1rem; background: var(--light); }
-  .index-preview { display: none; }
+.tile { position: relative; display: block; aspect-ratio: 3 / 4; overflow: hidden; background: var(--light); color: var(--text); text-decoration: none; }
+.tile img { width: 100%; height: 100%; object-fit: cover; transition: transform .5s ease; }
+.tile::after { content: ""; position: absolute; inset: 0; background: rgba(255,255,255,.1); transition: background .3s ease; }
+.tile:hover::after, .tile:focus-visible::after { background: rgba(255,255,255,.45); }
+.tile:hover img { transform: scale(1.03); }
+.tile-title {
+  position: absolute; inset: 0; z-index: 1;
+  display: flex; align-items: center; justify-content: center;
+  padding: 1.5rem; text-align: center;
+  font-family: var(--font-heading); font-size: var(--h4); line-height: 1.25;
 }
 
 /* ---------- About, Contact ---------- */
@@ -138,14 +114,19 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 .contact-social { display: flex; justify-content: center; margin-top: 1.25rem; }
 .contact-social a { display: inline-flex; padding: 4px; }
 
+/* ---------- Project pages ---------- */
+/* Change --gallery-width to make the photos bigger or smaller */
 .project { --gallery-width: 1200px; max-width: var(--gallery-width); margin: 0 auto; padding: 1rem 0 4rem; }
 .project-intro { margin: -.75rem 0 2.5rem; }
 
+/* Gallery: two columns, every photo shown in full (no cropping).
+   Photos flow down the left column, then the right. */
 .gallery { display: block; column-count: 2; column-gap: 32px; }
 .gallery figure { margin: 0 0 32px; break-inside: avoid; background: var(--light); }
 .gallery a { display: block; }
 .gallery img { width: 100%; height: auto; }
-
+/* Vertical photos (marked "tall" by build.js) are smaller and centered.
+   Change 78% to adjust: smaller number = smaller photo. */
 .gallery figure.tall { width: 78%; margin-left: auto; margin-right: auto; margin-bottom: 32px; }
 /* Name a file like DSCF1234-wide.jpg to make it span both columns */
 .gallery figure.wide { column-span: all; }
@@ -155,7 +136,7 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 .pager a { display: flex; align-items: center; gap: 1.1rem; text-decoration: none; max-width: 45%; }
 .pager .next { margin-left: auto; text-align: right; }
 
-
+/* hide the "Previous" / "Next" word visually, keep it for screen readers */
 .pager a span {
   position: absolute; width: 1px; height: 1px; overflow: hidden;
   clip: rect(0 0 0 0); white-space: nowrap;
@@ -199,8 +180,7 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
   .site-header nav a { font-size: 1.1rem; }
   .site-header nav ul { gap: 1.2rem; }
   .site-header nav svg { width: 24px; height: 24px; }
-  .index-item { grid-template-columns: 2.4rem 1fr; padding: 1.3rem 0; }
-  .index-count { grid-column: 2; margin-top: .4rem; }
+  .grid { grid-template-columns: 1fr; row-gap: 40px; }
   .gallery { column-gap: 12px; }
   .gallery figure { margin-bottom: 12px; }
   .gallery figure.tall { width: 86%; margin-bottom: 12px; }
@@ -208,5 +188,6 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
   .pager a::before, .pager a::after { width: 26px; height: 26px; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .index-item, .index-preview, .pager a::before, .pager a::after { transition: none; }
+  .tile img, .tile::after, .pager a::before, .pager a::after { transition: none; }
+  .tile:hover img { transform: none; }
 }

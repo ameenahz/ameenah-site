@@ -1,4 +1,3 @@
-
 const fs = require("fs");
 const path = require("path");
 
@@ -79,16 +78,11 @@ PROJECTS.forEach((p, idx) => {
   if (!cover) console.warn(`! ${dir}/ has no cover photo (name one cover.jpg)`);
 
   const coverSrc = `images/${p.slug}/${encodeURIComponent(cover || "cover.jpg")}`;
-  const count = `${photos.length} ${photos.length === 1 ? "photo" : "photos"}`;
 
-  rows.push(`        <li>
-          <a class="index-item" href="work/${p.slug}/index.html" data-img="${coverSrc}">
-            <span class="index-num">${String(idx + 1).padStart(2, "0")}</span>
-            <span class="index-name">${esc(p.title)}</span>
-            <span class="index-count">${count}</span>
-            <img class="index-thumb" src="${coverSrc}" alt="" loading="lazy">
-          </a>
-        </li>`);
+  rows.push(`      <a class="tile" href="work/${p.slug}/index.html">
+        <img src="${coverSrc}" alt="${esc(p.title)}" loading="lazy">
+        <span class="tile-title">${esc(p.title)}</span>
+      </a>`);
 
   let tallCount = 0;
   const figures = photos.map((file, i) => {
