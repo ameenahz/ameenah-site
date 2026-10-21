@@ -1,4 +1,4 @@
-
+/* Heading font from your Squarespace site (free on Google Fonts) */
 @import url("https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap");
 
 /* ---------- Design tokens (from your Squarespace styles) ---------- */
@@ -99,8 +99,16 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 }
 
 /* ---------- About, Contact ---------- */
-.text-page { max-width: 640px; padding: 3rem 0 6rem; }
-.text-page h1, .project h1 { font-size: var(--h2); }
+.about, .contact { text-align: center; padding: 1rem 0 5rem; }
+.about h1, .contact h1, .project h1 { font-size: var(--h2); }
+.about-title { max-width: 58.33%; margin: 0 auto 2.5rem; }
+.about-photo { width: 41.67%; margin: 0 auto 3rem; }
+.about-photo img { width: 100%; height: auto; background: var(--light); }
+.about-text { max-width: 58.33%; margin: 0 auto; }
+.contact { padding-top: 3rem; padding-bottom: 6rem; }
+.contact-text { max-width: 50%; margin: 0 auto; }
+.contact-social { display: flex; justify-content: center; margin-top: 1.25rem; }
+.contact-social a { display: inline-flex; padding: 4px; }
 
 /* ---------- Project pages ---------- */
 /* Change --gallery-width to make the photos bigger or smaller */
@@ -131,6 +139,8 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
   .site-header { padding: 6vw var(--gutter); }
 }
 @media (max-width: 767px) {
+  .about-title, .about-text, .contact-text { max-width: 100%; }
+  .about-photo { width: 75%; }
   .site-header nav ul { gap: 1.1rem; }
   .grid { grid-template-columns: 1fr; row-gap: 40px; }
   .gallery { gap: 12px; }
