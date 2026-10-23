@@ -20,6 +20,11 @@ const GALLERY_WIDTHS = [480, 800, 1200, 1600];
 const COVER_WIDTHS = [400, 700, 1000];
 const WEBP_QUALITY = 72;
 
+// About page photo (original goes in images/about/)
+const ABOUT_DIR = path.join("images", "about");
+const ABOUT_WIDTHS = [400, 700, 1000];
+const ABOUT_SIZES = "(max-width: 767px) 66vw, (min-width: 1400px) 513px, 37vw";
+
 // How many gallery photos load right away (the rest lazy-load)
 const EAGER_GALLERY_PHOTOS = 3;
 
@@ -197,6 +202,28 @@ function prune() {
 
   const home = fs.readFileSync("index.html", "utf8");
   fs.writeFileSync("index.html", fill(home, "TILES", rows.join("\n")));
+
+  // ---- About page photo ----
+  if (fs.existsSync("about.html")) {
+    fs.mkdirSync(ABOUT_DIR, { recursive: true });
+    const aboutFile = fs.readdirSync(ABOUT_DIR).filter((f) => IMAGE.test(f)).sort(byName)[0];
+    if (!aboutFile) {
+      console.warn(`! ${ABOUT_DIR}/ is empty (put your about photo there)`);
+    } else {
+      const info = await optimize(path.join(ABOUT_DIR, aboutFile), "about", ABOUT_WIDTHS);
+      const tag = imgTag({
+        info,
+        prefix: "",
+        alt: "Ameenah Ramsey",
+        sizes: ABOUT_SIZES,
+        eager: true,
+        priority: true,
+      });
+      const aboutHtml = fs.readFileSync("about.html", "utf8");
+      fs.writeFileSync("about.html", fill(aboutHtml, "ABOUT_PHOTO", `        ${tag}`));
+      console.log(`about: ${aboutFile} ok`);
+    }
+  }
 
   prune();
   fs.writeFileSync(SETTINGS_FILE, SETTINGS_KEY);
