@@ -6,6 +6,7 @@ const PROJECTS = [
   {
     slug: "dinner-party",
     title: "Fable x Sally Al-Hadidi Dinner Party",
+    // The last gallery photo links here 
     lastPhotoLink: "https://fable.com/pages/come-host-with-me-episode-06",
   },
   { slug: "street-and-documentary", title: "Street and Documentary" },
@@ -15,13 +16,18 @@ const PROJECTS = [
 
 // ---- Image optimization settings ----
 const OUT_ROOT = path.join("images", "optimized");
-const GALLERY_WIDTHS = [480, 800, 1200, 1800, 2400];
-const COVER_WIDTHS = [480, 800, 1200];
-const WEBP_QUALITY = 78;
+const GALLERY_WIDTHS = [480, 800, 1200, 1600];
+const COVER_WIDTHS = [400, 700, 1000];
+const WEBP_QUALITY = 72;
 
-// Adjust these to match your CSS layout (how wide the image displays)
-const GALLERY_SIZES = "(max-width: 900px) 100vw, 1200px";
-const COVER_SIZES = "(max-width: 700px) 100vw, 50vw";
+// How many gallery photos load right away (the rest lazy-load)
+const EAGER_GALLERY_PHOTOS = 3;
+
+// How wide each image actually displays, matched to style.css.
+// If you change --gallery-width, the gutters or the grid gaps, update these.
+const GALLERY_SIZES = "(min-width: 1364px) 584px, 44vw"; // two-column gallery
+const WIDE_SIZES = "(min-width: 1364px) 1200px, 88vw"; // -wide photos span both columns
+const COVER_SIZES = "(max-width: 767px) 88vw, (min-width: 1400px) 576px, 44vw"; // homepage tiles
 
 const IMAGE = /\.(jpe?g|png|webp|avif)$/i;
 const byName = (a, b) => a.localeCompare(b, undefined, { numeric: true });
@@ -34,8 +40,19 @@ function fill(html, tag, content) {
   return html.replace(re, (_, start, end) => `${start}\n${content}\n        ${end}`);
 }
 
+// ---- Settings tracking: if you change widths/quality, everything is regenerated ----
+fs.mkdirSync(OUT_ROOT, { recursive: true });
+const SETTINGS_FILE = path.join(OUT_ROOT, ".settings");
+const SETTINGS_KEY = JSON.stringify({ GALLERY_WIDTHS, COVER_WIDTHS, WEBP_QUALITY });
+const forceRebuild =
+  !fs.existsSync(SETTINGS_FILE) || fs.readFileSync(SETTINGS_FILE, "utf8") !== SETTINGS_KEY;
+if (forceRebuild) console.log("Settings changed (or first run): regenerating all images...");
+
+// Files we want to keep this run; anything else in images/optimized/ gets deleted
+const keep = new Set();
+
 // Resize one source image into several WebP widths (skips files already up to date).
-// Returns paths relative to the site root, plus dimensions for width/height attributes.
+// Returns paths relative to the site root, a tiny blur placeholder, and dimensions.
 async function optimize(srcFile, slug, targetWidths) {
   const meta = await sharp(srcFile).metadata();
   // EXIF orientations 5-8 mean the image is rotated 90°, so width/height swap
@@ -55,7 +72,10 @@ async function optimize(srcFile, slug, targetWidths) {
   for (const width of widths) {
     const outName = `${base}-${width}.webp`;
     const outPath = path.join(outDir, outName);
-    const upToDate = fs.existsSync(outPath) && fs.statSync(outPath).mtimeMs >= srcTime;
+    keep.add(path.resolve(outPath));
+
+    const upToDate =
+      !forceRebuild && fs.existsSync(outPath) && fs.statSync(outPath).mtimeMs >= srcTime;
     if (!upToDate) {
       await sharp(srcFile)
         .rotate() // apply EXIF orientation, then strip it
@@ -66,20 +86,49 @@ async function optimize(srcFile, slug, targetWidths) {
     variants.push({ width, rel: `images/optimized/${slug}/${outName}` });
   }
 
+  // Tiny 24px preview, embedded in the HTML so something shows instantly
+  const tiny = await sharp(srcFile)
+    .rotate()
+    .resize({ width: 24 })
+    .webp({ quality: 40 })
+    .toBuffer();
+  const placeholder = `data:image/webp;base64,${tiny.toString("base64")}`;
+
   const largest = variants[variants.length - 1];
   return {
     variants,
+    placeholder,
     width: largest.width,
     height: Math.round((largest.width * h) / w),
   };
 }
 
 // Build an <img> tag. `prefix` is the path back to site root ("" or "../../")
-function imgTag({ info, prefix, alt, sizes, eager }) {
+// eager: load right away. priority: also tell the browser it's the most important one.
+function imgTag({ info, prefix, alt, sizes, eager, priority }) {
   const srcset = info.variants.map((v) => `${prefix}${v.rel} ${v.width}w`).join(", ");
   const fallback = info.variants[Math.min(1, info.variants.length - 1)];
-  const loading = eager ? `loading="eager" fetchpriority="high"` : `loading="lazy"`;
-  return `<img src="${prefix}${fallback.rel}" srcset="${srcset}" sizes="${sizes}" width="${info.width}" height="${info.height}" alt="${esc(alt)}" ${loading} decoding="async">`;
+  const loading = eager
+    ? `loading="eager"${priority ? ` fetchpriority="high"` : ""}`
+    : `loading="lazy"`;
+  const style = `background:url('${info.placeholder}') center/cover no-repeat`;
+  return `<img src="${prefix}${fallback.rel}" srcset="${srcset}" sizes="${sizes}" width="${info.width}" height="${info.height}" style="${style}" alt="${esc(alt)}" ${loading} decoding="async">`;
+}
+
+// Delete optimized files that no longer belong to any photo
+function prune() {
+  let removed = 0;
+  for (const slug of fs.readdirSync(OUT_ROOT)) {
+    const dir = path.join(OUT_ROOT, slug);
+    if (!fs.statSync(dir).isDirectory()) continue;
+    for (const f of fs.readdirSync(dir)) {
+      if (!keep.has(path.resolve(dir, f))) {
+        fs.unlinkSync(path.join(dir, f));
+        removed++;
+      }
+    }
+  }
+  if (removed) console.log(`Removed ${removed} unused optimized file(s).`);
 }
 
 (async () => {
@@ -95,7 +144,7 @@ function imgTag({ info, prefix, alt, sizes, eager }) {
 
     if (!cover) console.warn(`! ${dir}/ has no cover photo (name one cover.jpg)`);
 
-    // ---- Cover tile on the homepage ----
+    // ---- Cover tile on the homepage (all load right away, first two get top priority) ----
     if (cover) {
       const info = await optimize(path.join(dir, cover), p.slug, COVER_WIDTHS);
       const tag = imgTag({
@@ -103,7 +152,8 @@ function imgTag({ info, prefix, alt, sizes, eager }) {
         prefix: "",
         alt: p.title,
         sizes: COVER_SIZES,
-        eager: idx < 2, // first two tiles are likely above the fold
+        eager: true,
+        priority: idx < 2,
       });
       rows.push(`      <a class="tile" href="work/${p.slug}/index.html">
         ${tag}
@@ -119,13 +169,15 @@ function imgTag({ info, prefix, alt, sizes, eager }) {
     const figures = [];
     for (const [i, file] of photos.entries()) {
       const info = await optimize(path.join(dir, file), p.slug, GALLERY_WIDTHS);
-      const cls = /-wide\./i.test(file) ? ` class="wide"` : "";
+      const isWide = /-wide\./i.test(file);
+      const cls = isWide ? ` class="wide"` : "";
       let img = imgTag({
         info,
         prefix: "../../",
         alt: `${p.title}, photo ${i + 1}`,
-        sizes: GALLERY_SIZES,
-        eager: i === 0, // only the first photo loads right away
+        sizes: isWide ? WIDE_SIZES : GALLERY_SIZES,
+        eager: i < EAGER_GALLERY_PHOTOS,
+        priority: i === 0,
       });
       if (p.lastPhotoLink && i === photos.length - 1) {
         img = `<a href="${p.lastPhotoLink}" target="_blank" rel="noopener">${img}</a>`;
@@ -145,6 +197,9 @@ function imgTag({ info, prefix, alt, sizes, eager }) {
 
   const home = fs.readFileSync("index.html", "utf8");
   fs.writeFileSync("index.html", fill(home, "TILES", rows.join("\n")));
+
+  prune();
+  fs.writeFileSync(SETTINGS_FILE, SETTINGS_KEY);
   console.log("Done.");
 })().catch((err) => {
   console.error(err);

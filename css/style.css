@@ -1,6 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap");
-
-
 :root {
   --bg: #fff;
   --text: #000;
@@ -54,7 +51,8 @@ body {
   -webkit-font-smoothing: antialiased;
   overflow-wrap: break-word;
 }
-img { display: block; max-width: 100%; }
+/* height:auto lets the width/height attributes reserve space without stretching */
+img { display: block; max-width: 100%; height: auto; }
 a { color: inherit; }
 a:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
 ul, ol { list-style: none; margin: 0; padding: 0; }
@@ -115,7 +113,8 @@ main { max-width: var(--max); margin: 0 auto; padding: 0 var(--gutter); }
 .contact-social a { display: inline-flex; padding: 4px; }
 
 /* ---------- Project pages ---------- */
-/* Change --gallery-width to make the photos bigger or smaller */
+/* Change --gallery-width to make the photos bigger or smaller
+   (if you change it, update GALLERY_SIZES in build.js to match) */
 .project { --gallery-width: 1200px; max-width: var(--gallery-width); margin: 0 auto; padding: 1rem 0 4rem; }
 .project-intro { margin: -.75rem 0 2.5rem; }
 
